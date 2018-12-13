@@ -2,6 +2,13 @@ var chokidar = require('chokidar')
 var os = require('os')
 var fs = require('fs')
 
+console.log(`
+    ########################
+    #        OXTON         #
+    ########################                       
+    `
+)
+
 const sourceDir = 'source'
 const destinationDir = 'destination'
 
@@ -11,57 +18,62 @@ var watcher = chokidar.watch(sourceDir, {
     ignoreInitial: true
 });
 
+function log(message) {
+    var date = new Date()
+    console.log(`[${date.toISOString()}]: ${message}`)
+}
+
 function updateFile(changePath, savePath=null) {
     if (!savePath) {
         var savePath = changePath.replace(sourceDir, destinationDir)
     }
 
-    console.log(`Updating: ${savePath}`)
+    log(`Updating: ${savePath}`)
     
     fs.copyFile(changePath, savePath, (err) => {
         if (err) throw err
-        console.log(`Synced file ${changePath} to ${savePath}`)    
+        log(`Synced file ${changePath} to ${savePath}`)    
     })
 }
 
 function addFile(addPath) {
     var savePath = addPath.replace(sourceDir, destinationDir)
-    console.log(`Adding: ${savePath}`)
+    log(`Adding: ${savePath}`)
 
     fs.writeFile(savePath, '', (err) => {
         if (err) throw err;
-        console.log(`File created: ${savePath}`)
+        log(`File created: ${savePath}`)
         updateFile(addPath, savePath)
     })
 }
 
 function removeFile(removedPath) {
     var removePath = removedPath.replace(sourceDir, destinationDir)
-    console.log(`Removing: ${removePath}`)
+    log(`Removing: ${removePath}`)
 
     fs.unlink(removePath, (err) => {
         if (err) throw err;
-        console.log(`Removed file ${removePath}`)
+        log(`Removed file ${removePath}`)
     })
 }
 
 function addDir(addPath) {
     var savePath = addPath.replace(sourceDir, destinationDir)
-    console.log(`Adding dir: ${savePath}`)
+    log(`Adding dir: ${savePath}`)
 
     fs.mkdir(savePath, {recursive: true}, (err) => {
         if (err) throw err;
-        console.log(`Added dir: ${savePath}`)
+        log(`Added dir: ${savePath}`)
     })
 }
 
 function removeDir(removedPath) {
     var removeDir = removedPath.replace(sourceDir, destinationDir)
-    console.log(`Removing dir: ${removeDir}`)
+    log(`Removing dir: ${removeDir}`)
 
     fs.rmdir(removeDir, (err) => {
         if (err) throw err;
-        console.log(`Removed dir: ${removeDir}`)
+        log(`Removed dir: ${removeDir}`)
     })
 }
 
@@ -73,4 +85,4 @@ watcher.on('unlink', path => removeFile(path))
 watcher.on('addDir', path => addDir(path))
 watcher.on('unlinkDir', path => removeDir(path))
 
-console.log('Watching...')
+log('Watching...')

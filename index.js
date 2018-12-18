@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var program = require('commander');
 var chokidar = require('chokidar');
 var funcs = require('./commands');
